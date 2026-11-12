@@ -115,6 +115,39 @@ Model.save_predictions(folderpath + 'MyResults')
 
 
 ```
+## Horizontal sections (in development)
+A model for mouse horizontal sections tilted up to ~30° from horizontal, trained on
+nuclear-stain fluorescence-like reslices of the Allen volumes, is being developed in
+[`training/`](training/README.md). Once its weights are in
+`DeepSlice/metadata/weights/DeepSlice_mouse_horizontal.h5`:
+
+```python
+Model = DSModel('mouse', orientation='horizontal')
+# images: anterior at the top, seen from the dorsal side; one or both hemispheres
+Model.predict(folderpath, section_numbers=True)
+# optional, and before propagate_angles (mirroring flips the sign of roll): the hemisphere
+# imaged; sections mounted ventral side up are predicted on the other side otherwise
+Model.set_hemisphere('left', all_sections=True)   # all_sections: the whole series is one hemisphere
+Model.set_bad_sections(bad_sections=["_s094"])
+Model.propagate_angles()                 # robust weighted mean pitch (AP) and roll (ML) tilt
+Model.enforce_index_order()
+Model.enforce_index_spacing(section_thickness=50)  # µm, strongly recommended
+Model.propagate_scale(pixel_size_um=4.0) # optional: series-wide scale from the pixel size
+Model.save_predictions(folderpath + 'MyResults')
+```
+
+Sections near the dorsal and ventral ends have few landmarks. Their tilt, depth and
+(optionally) scale are taken from the well-structured middle of the series, so section
+numbers (`_sXXX` in filenames, accounting for missing sections) matter. One-hemisphere
+images do not need to be marked as bad sections with this model.
+
+The saved CSV has quality-control columns: `hemisphere` and `left_fraction` (which side
+of the midline the tissue maps to), `depth_residual` (how far a section's own predicted
+depth was from the series line, in 25 µm voxels) and `outlier_depth`/`outlier_tilt`
+(sections whose own prediction was rejected). Check flagged sections by eye: they are
+typically small fragments at the ends of a tilted series, and their position within the
+section plane may be wrong even after their depth and tilt are corrected.
+
 ## Acknowledgements
 We are grateful to Ann Goodchild for her time-saving blunt assessments of many failed prototypes, for the motivation provided by Dr William Redmond, and especially to Veronica Downs, Freja Warner Van Dijk and Jayme McCutcheon, whose Novice alignments were instrumental to this work. We would like to thank Gergely Csúcs for providing his expertise and many atlasing tools. Work in the authors’ laboratories is supported by the National Health & Medical Research Council of Australia, the Hillcrest Foundation, and Macquarie University (SMcM), and from the European Union’s Horizon 2020 Framework Program for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3) and the Research Council of Norway under Grant Agreement No. 269774 (INCF, JGB). We are grateful to Macquarie University for access to their HPC resources, essential for production of early DeepSlice prototypes.
 

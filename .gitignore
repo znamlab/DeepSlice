@@ -37,3 +37,8 @@ pip-delete-this-directory.txt
 DeepSlice.egg-info
 test.py
 .vscode/settings.json
+
+# training data and outputs
+training/data/
+training/runs/
+.venv/

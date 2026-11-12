@@ -8,11 +8,15 @@
             "primary":{"path":"weights/RatModelInProgress.h5","url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/weights/RatModelInProgress.h5"},
             "secondary":{"path":"weights/RatModelScratch.h5", "url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/weights/RatModelScratch.h5"}
             },
+        "mouse_horizontal":{
+            "primary":{"path":"weights/DeepSlice_mouse_horizontal.h5","url":null}
+            },
         "xception_imagenet":{"path":"weights/xception_weights_tf_dim_ordering_tf_kernels.h5", "url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/weights/xception_weights_tf_dim_ordering_tf_kernels.h5"}
     },
     "ensemble_status":{
         "mouse":"True",
-        "rat":"False"
+        "rat":"False",
+        "mouse_horizontal":"False"
         },
     "target_volumes":{
         "mouse":{"name":"ABA_Mouse_CCFv3_2017_25um.cutlas","voxel_size_microns":25},
@@ -31,6 +35,7 @@
         },
         "rat":{"path":"WHS_SD_rat_T2star_v1.01.nii","url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/volumes/WHS_SD_rat_T2star_v1.01.nii"}
     },
+"depth_weights":{"mouse_horizontal": {"z": [10.0, 30.0, 50.0, 70.0, 90.0, 110.0, 130.0, 150.0, 170.0, 190.0, 210.0, 230.0, 250.0, 270.0, 290.0, 310.0], "weight": [0.396, 0.686, 0.846, 0.899, 0.932, 1.0, 0.84, 0.892, 0.91, 0.867, 0.964, 0.961, 0.915, 0.96, 0.789, 0.579]}},
 "default_volumes":{
     "mouse":"nissl",
     "rat":"MRI"

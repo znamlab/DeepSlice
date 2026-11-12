@@ -42,6 +42,12 @@ def get_data_path(url_path_dict, path):
     :return: the path to the data
     :rtype: str
     """
+    if os.path.isabs(url_path_dict["path"]):
+        return url_path_dict["path"]
     if not os.path.exists(path + url_path_dict["path"]):
+        if not url_path_dict.get("url"):
+            raise FileNotFoundError(
+                f"{path + url_path_dict['path']} not found and no download URL is configured"
+            )
         download_file(url_path_dict["url"], path + url_path_dict["path"])
     return path + url_path_dict["path"]

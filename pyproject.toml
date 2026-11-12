@@ -48,6 +48,9 @@ DeepSlice = [
     "metadata/weights/*.txt",
 ]
 
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
 [tool.setuptools_scm]
 fallback_version = "0.0.0"
 local_scheme = "no-local-version"
