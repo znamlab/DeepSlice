@@ -8,6 +8,7 @@ from glob import glob
 import pandas as pd
 import numpy as np
 import os
+import re
 from skimage.color import rgb2gray
 import warnings
 import h5py
@@ -84,9 +85,17 @@ def load_xception_weights(model, weights, species="mouse"):
         weight_names_layers = [
             name.decode("utf-8").split("/")[0] for name in weight_names
         ]
+        # Xception's residual-branch convolutions and batch norms are unnamed, so Keras
+        # numbers them globally (conv2d, conv2d_1, ...). A second model built in the
+        # same session gets different numbers, so match them by order instead.
+        file_to_model = _match_auto_named_layers(
+            list(dict.fromkeys(weight_names_layers)),
+            [layer.name for layer in model.layers[xception_idx].layers],
+        )
 
         for i in range(len(model.layers[xception_idx].layers)):
             name_of_layer = model.layers[xception_idx].layers[i].name
+            name_of_layer = file_to_model.get(name_of_layer, name_of_layer)
             # if layer name is in the weight names, then we will set weights
             if name_of_layer in weight_names_layers:
                 # Get name of weights in the layer
@@ -101,6 +110,23 @@ def load_xception_weights(model, weights, species="mouse"):
                 weights_list = [np.array(h5_group[kk]) for kk in layer_weight_names]
                 model.layers[xception_idx].layers[i].set_weights(weights_list)
     return model
+
+
+def _match_auto_named_layers(
+    file_layers, model_layers, prefixes=("batch_normalization", "conv2d")
+):
+    """Map auto-named model layers to the saved names, by order of appearance.
+
+    :return: dict from model layer name to the saved layer name
+    """
+    mapping = {}
+    for prefix in prefixes:
+        pattern = re.compile(rf"{prefix}(_\d+)?")
+        saved = [n for n in file_layers if pattern.fullmatch(n)]
+        current = [n for n in model_layers if pattern.fullmatch(n)]
+        if len(saved) == len(current):
+            mapping.update(zip(current, saved))
+    return mapping
 
 
 def load_images_from_path(image_path: str) -> np.ndarray:
